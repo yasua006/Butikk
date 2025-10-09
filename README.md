@@ -10,5 +10,5 @@ Koden håndterer feil og vi unngår noen krasjer, men det mangler salg registrer
 
 
 ## For Få koden til å kjøre i TS:
-- Installer NPM.js på maskinen: [Installer NPM.js - åpnes i en ny fane](https://www.npmjs.com/package/download)
+- Installer NPM.js på maskinen: [Installer NPM.js - åpnes i en ny fane](https://www.npmjs.com/package/download){:target="_blank"}
 - Kjør på prosjektet i terminalen: ```npm install typescript ts-import sqlite sqlite3 prompt-sync```
