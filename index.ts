@@ -1,6 +1,4 @@
-// vi bruker node.js for å få sqlite3
-
-// IIFE med klasse = dobbelt så mye sikkerhet. Ikke redundant!
+// IIFE med klasse = dobbelt så mye sikkerhet. Ikke redundant! Tenk om det!
 (() => { // Arrow IIFE
     'use strict'; // hjelper med feil i kjøre tid
 
@@ -10,7 +8,7 @@
         #sqlite3;
         #db;
 
-        // lag en constructor for lett navigering
+        // lag en constructor for lett navigering, den blir brukt i et sted
         constructor () {
             // hent sqlite3 fra npm biblioteket
             this.#sqlite3 = require('sqlite3');
@@ -34,7 +32,7 @@
             this.#lag_lister();
         }
 
-        // privat funksjon til å håndtere lagring av tom lister
+        // privat funksjon til å håndtere lagring av tomme lister
         #lag_lister(): void {
             this.#db.serialize();
 
@@ -57,6 +55,9 @@
 
         // privat funksjon til lagring av liste rows
         #lagring_av_rows(): void {
+            // hent prompt sync fra npm biblioteket for å lage input listene
+            const prompt = require('prompt-sync')(); // da får man prompt funksjonen på node
+
             // lag lageret for inventar
             const inventar_lager = this.#db.prepare('INSERT INTO Inventar (navn, pris, antall) VALUES (?, ?, ?)');
             inventar_lager.run('Jus', 99, 1);
@@ -72,11 +73,8 @@
             // hent og logg lister for ikke input
             this.#hent_og_logg_lister(false);
 
-            // hent prompt sync fra npm biblioteket
-            const prompt = require('prompt-sync')(); // da får man prompt funksjonen på node
-
             // lag samtykke input
-            let samtykke: string | undefined = prompt("Vil du lage en vare? ")?.toLowerCase();
+            let samtykke: string | undefined = String(prompt("Vil du lage en vare? ", "")?.toLowerCase());
 
             // lag en løkke for å håndtere laging av varer
             while (samtykke != "ferdig" && samtykke != "stopp" && samtykke != "") { // stopp om man vil ikke fortsette ("ferdig" eller "stopp" eller tom)
@@ -115,6 +113,7 @@
                     // kjøre lagring av liste rows for inventar input
                     inventar_inp_lager.finalize();
                 } catch (err) {
+                    // stoppe metoden når feil skjer på catch
                     if (err) {
                         this.#db.close();
                         throw new Error(`Kunne ikke lage varen!" ${err}`);
@@ -136,22 +135,24 @@
             if (!er_inp) {
                 // hent og logg data for inventar
                 this.#db.each('SELECT * FROM Inventar', (err: Error | null, row: any) => {
-                    // logg tabell logging feil og avslutt database connection, om feil skjer
+                    // logg list logging feil og avslutt database connection, om feil skjer
                     if (err) {
                         this.#db.close();
                         throw new Error(`Kunne ikke hente data for inventar (ikke input)! ${err.message}`);
                     }
+
                     // ingen feil, logg resultatet
                     console.log(`${row.id} — ${row.navn} — ${row.pris} — ${row.antall}`)
                 });
 
                 // hent og logg data for salg
                 this.#db.each('SELECT * FROM Salg', (err: Error | null, row: any) => {
-                    // logg tabell logging feil og avslutt database connection, om feil skjer
+                    // logg list logging feil og avslutt database connection, om feil skjer
                     if (err) {
                         this.#db.close();
                         throw new Error(`Kunne ikke hente data for salg (ikke input)! ${err.message}`);
                     }
+
                     // ingen feil, logg resultatet
                     console.log(`${row.id} — ${row.vare_id} — ${row.dato} — ${row.antall}`)
             });
@@ -159,30 +160,32 @@
             } else {
             // hent og logg data for inventar input
             this.#db.each('SELECT * FROM Inventar_Input', (err: Error | null, row: any) => {
-                // logg tabell logging feil og avslutt database connection, om feil skjer
+                // logg list logging feil og avslutt database connection, om feil skjer
                 if (err) {
                     this.#db.close();
                     throw new Error(`Kunne ikke hente data for inventar input! ${err.message}`);
                 }
+
                 // ingen feil, logg resultatet
                 console.log(`${row.id} — ${row.navn} — ${row.pris} — ${row.antall}`)
             });
 
             // hent og logg data for salg input
             this.#db.each('SELECT * FROM Salg_Input', (err: Error | null, row: any) => {
-                // logg tabell logging feil og avslutt database connection, om feil skjer
+                // logg list logging feil og avslutt database connection, om feil skjer
                 if (err) {
                     this.#db.close();
                     throw new Error(`Kunne ikke hente data for salg input! ${err.message}`);
                 }
+
                 // ingen feil, logg resultatet
                 console.log(`${row.id} — ${row.vare_id} — ${row.dato} — ${row.antall}`)
             });
 
-            // til slutt, avslutt den tabell connection etter 3 sekunder
+            // til slutt, avslutt den list connection etter 3 sekunder
             setTimeout(() => {
                 this.#db.close();
-            }, 3000)
+            }, 3000);
             }
         }
     }
