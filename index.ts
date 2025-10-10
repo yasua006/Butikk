@@ -34,23 +34,23 @@
 
         // privat funksjon til å håndtere lagring av tomme lister
         #lag_lister(): void {
-            this.#db.serialize();
+            this.#db.serialize(() => {
+                const ny_list: string = 'CREATE TABLE IF NOT EXISTS'; // list laging hjelper for ny database lister
 
-            const ny_list: string = 'CREATE TABLE IF NOT EXISTS'; // list laging hjelper for ny database lister
+                const id: string = 'id INTEGER PRIMARY KEY'; // primary id hjelper for ny database lister
+                const antall: string = 'antall REAL'; // antall hjelper for ny database lister
 
-            const id: string = 'id INTEGER PRIMARY KEY'; // primary id hjelper for ny database lister
-            const antall: string = 'antall REAL'; // antall hjelper for ny database lister
+                // lag ikke input listene
+                this.#db.run(`${ny_list} Inventar (${id}, navn TEXT, pris REAL, ${antall})`);
+                this.#db.run(`${ny_list} Salg (${id}, vare_id REAL, dato TEXT, ${antall})`);
 
-            // lag ikke input listene
-            this.#db.run(`${ny_list} Inventar (${id}, navn TEXT, pris REAL, ${antall})`);
-            this.#db.run(`${ny_list} Salg (${id}, vare_id REAL, dato TEXT, ${antall})`);
+                // lag input listene
+                this.#db.run(`${ny_list} Inventar_Input (${id}, navn TEXT, pris REAL, ${antall})`);
+                this.#db.run(`${ny_list} Salg_Input (${id}, vare_id REAL, dato TEXT, ${antall})`);
 
-            // lag input listene
-            this.#db.run(`${ny_list} Inventar_Input (${id}, navn TEXT, pris REAL, ${antall})`);
-            this.#db.run(`${ny_list} Salg_Input (${id}, vare_id REAL, dato TEXT, ${antall})`);
-
-            // etter på, lagring av rows
-            this.#lagring_av_rows();
+                // etter på, lagring av rows
+                this.#lagring_av_rows();
+            });
         }
 
         // privat funksjon til lagring av liste rows
@@ -63,7 +63,7 @@
             inventar_lager.run('Jus', 99, 1);
 
             // lag lageret for salg
-            const salg_lager = this.#db.prepare('INSERT INTO Salg (dato, antall) VALUES (?, ?)');
+            const salg_lager = this.#db.prepare('INSERT INTO Salg (vare_id, dato, antall) VALUES (?, ?, ?)');
             salg_lager.run(1, '03-03-2023', 3);
 
             // kjøre lagring av liste rows (ikke input)
@@ -142,7 +142,7 @@
                     }
 
                     // ingen feil, logg resultatet
-                    console.log(`${row.id} — ${row.navn} — ${row.pris} — ${row.antall}`)
+                    console.log(row);
                 });
 
                 // hent og logg data for salg
@@ -154,7 +154,7 @@
                     }
 
                     // ingen feil, logg resultatet
-                    console.log(`${row.id} — ${row.vare_id} — ${row.dato} — ${row.antall}`)
+                    console.log(row);
             });
             // håndtere input lister
             } else {
@@ -167,7 +167,7 @@
                 }
 
                 // ingen feil, logg resultatet
-                console.log(`${row.id} — ${row.navn} — ${row.pris} — ${row.antall}`)
+                console.log(row);
             });
 
             // hent og logg data for salg input
@@ -179,7 +179,7 @@
                 }
 
                 // ingen feil, logg resultatet
-                console.log(`${row.id} — ${row.vare_id} — ${row.dato} — ${row.antall}`)
+                console.log(row);
             });
 
             // til slutt, avslutt den list connection etter 3 sekunder
