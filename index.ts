@@ -48,13 +48,16 @@ class Klasse {
                 case "ja":
                     // kjør lagring
                     this.#lagring_av_råder();
+                    break;
                 // man vil fjerne
                 case "nei":
                     // kjør fjerning
                     this.#slett_inventar_råder();
+                    break;
                 // håndtere tom valg (man vil avslutte)
                 default:
                     console.log("OK!");
+                    break;
             }
         });
     }
